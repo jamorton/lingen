@@ -32,7 +32,7 @@ class TRegister(Terminal):
         state.registers[self.registers] = value
 
     def tostring(self):
-        return "register[" + self.register + "]"
+        return "register[" + str(self.register) + "]"
 
 class TConstant(Terminal):
     readonly = True

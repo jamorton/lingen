@@ -101,7 +101,7 @@ class Program(object):
         while len(self.source) < minlen or \
               (random.random() > stop_chance and len(self.source) < maxlen):
 
-            newfunc = random.choice(self.world.functions)
+            newfunc = random.choice(self.world.functions)(self)
             self.source.append(newfunc)
             
 

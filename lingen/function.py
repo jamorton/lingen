@@ -12,10 +12,10 @@ class Function(object):
         if self.has_output == True:
             if len(program.world.terminals_writable) < 1:
                 raise Exception("No writable terminals for function output!")
-            self.output = choice(program.world.terminals_writable)
+            self.output = choice(program.world.terminals_writable)(program)
 
         terms = program.world.terminals
-        self.inputs = [choice(terms) for i in xrange(self.num_args)]
+        self.inputs = [choice(terms)(program) for i in xrange(self.num_args)]
 
         self.curstate = None
         
