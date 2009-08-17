@@ -3,6 +3,8 @@
 import random
 import copy
 
+import terminal
+import function
 
 class BaseSimulator(object):
     pass
@@ -10,7 +12,7 @@ class BaseSimulator(object):
 
 default_config = {
 
-    # Genetics options
+    # Genetics/World options
     "population_size": 100,
     "max_generations": 200,
     "elite_rate": 0.1,
@@ -26,8 +28,8 @@ default_config = {
     "constant_input_ratio": 0.5,
 
     # Data options
-    "terminals": [],
-    "functions": [],
+    "terminals": [terminal.TRegister, terminal.TConstant],
+    "functions": [function.FAdd, function.FSub, function.FDiv, function.FMul],
     "constants": [1, 5, 10, 20, 50, 100],
     "inputs": [range(i, i+5) for i in xrange(5)]
 
@@ -35,7 +37,6 @@ default_config = {
 
 
 def reduce_weights(inp):
-    
     # TODO: This is bloated. Alternatives please...
     
     values = inp[:]
@@ -78,12 +79,13 @@ class Program(object):
     def __init__(self, world):
         self.source = []
         self.world = world
-        # shortcut
         self.config = world.config
+        self.randomize()
         
     def run(self):
         state = ProgramRunState(self)
 
+        # TODO: Better program flow control
         for func in self.source:
             func.execute(state)
 
@@ -100,8 +102,7 @@ class Program(object):
               (random.random() > stop_chance and len(self.source) < maxlen):
 
             newfunc = random.choice(self.world.functions)
-            
-
+            self.source.append(newfunc)
             
 
     def copy_source(self):
@@ -110,22 +111,29 @@ class Program(object):
 
 class World(object):
     def __init__(self,  options = [], **kwargs):
-        self.config = default_config.update(options).update(kwargs)
 
-        self.config["inputs"]    = reduce_weights(kwargs["inputs"])
-        self.config["constants"] = reduce_weights(kwargs["constants"])
+        self.config = default_config
+        self.config.update(options)
+        self.config.update(kwargs)
+
+        # TODO: Make sure terminals don't appear in config['terminals'] if their
+        # num is less than one. (num_flags, num_registers, num_inputs, etc)
         
-        self.functions = kwargs["functions"]
-        self.terminals = kwargs["terminals"]
+        self.config["inputs"]    = reduce_weights(self.config["inputs"])
+        self.config["constants"] = reduce_weights(self.config["constants"])
+        
+        self.functions = self.config["functions"]
+        self.terminals = self.config["terminals"]
         
         # find out which terminals can be written to.
         self.terminals_writable = []
         for term in self.terminals:
             if term.readonly == False:
-                self.terminals_writeable.append(term)
+                self.terminals_writable.append(term)
 
 
-
+    def new_program(self):
+        return Program(self)
 
 
 

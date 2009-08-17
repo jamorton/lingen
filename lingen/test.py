@@ -1,7 +1,9 @@
 
-from lingen import reduce_weights
+import lingen
 
+world = lingen.World()
 
+p = world.new_program()
 
-
-print reduce_weights([1, (2, 2), (3, 3), (4, 4), 5])
+for i in p.source:
+    print i.tostring()

@@ -16,7 +16,7 @@ class Terminal(object):
         raise Exception("write not implemented! (maybe set readonly to True?)")
     
     def tostring(self):
-        return "<terminal>"
+        return "<" + self.__class__.__name+ ">"
 
 class TRegister(Terminal):
     readonly = False

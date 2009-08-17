@@ -1,13 +1,17 @@
 
-from random import randint, choice
+from random import  choice
     
+
 class Function(object):
     has_output = False
     num_args   = 0
+    function_str  = None
     def __init__(self, program):
         self.program = program
 
         if self.has_output == True:
+            if len(program.world.terminals_writable) < 1:
+                raise Exception("No writable terminals for function output!")
             self.output = choice(program.world.terminals_writable)
 
         terms = program.world.terminals
@@ -33,41 +37,48 @@ class Function(object):
         return self.inputs[t].evaluate(self.curstate)
 
     def tostring(self):
+        if self.function_str == None:
+            self.function_str = self.__class__.__name__.lower()
+        # Bleh...
+        ostr = ", ".join([i.tostring() for i in self.inputs])
+        ostr = self.function_str + " (" + ostr + ")"
         if self.has_output:
-            return self.output.tostring() + \
-                " = <" + self.__class__.__name__ + ">(" + \
-                ' '.join(self.inputs) + ")"
+            ostr = self.output.tostring() + " = " + ostr
+
+        return ostr
+
 
 class ArithmeticFunction(Function):
     has_output = True
     num_args = 2
-    arithmetic_str = "<arithmetic>"
-
+    function_str = "<arithmetic>"
+    
     def tostring(self):
-        return ' '.join((self.output.tostring(),  "=", self.inputs[0].tostring(),
-             self.arithmetic_str, self.inputs[1].tostring()))
+        return ' '.join((self.output.tostring(), "=", self.inputs[0].tostring(),
+                         self.function_str, self.inputs[1].tostring()))
 
 
+    
 class FAdd(ArithmeticFunction):
-    arithmetic_str = "+"
+    function_str = "+"
     
     def run(self, state):
         return self.input(0) + self.input(1)
 
-class FSubtract(ArithmeticFunction):
-    arithmetic_str = "-"
+class FSub(ArithmeticFunction):
+    function_str = "-"
     
     def run(self, state):
         return self.input(0) - self.input(1)
 
-class FDivide(ArithmeticFunction):
-    arithmetic_str = "/"
+class FDiv(ArithmeticFunction):
+    function_str = "/"
 
     def run(self, state):
         return self.input(0) / self.input(1)
 
-class FMultiply(ArithmeticFunction):
-    arithmetic_str = "*"
+class FMul(ArithmeticFunction):
+    function_str = "*"
 
     def run(self, state):
         return self.ipnut(0) * self.input(1)
