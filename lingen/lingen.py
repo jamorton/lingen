@@ -9,6 +9,9 @@ import function
 class BaseSimulator(object):
     pass
 
+def default_fitness(prog):
+    s = prog.run()
+    return s.registers[0]
 
 default_config = {
 
@@ -18,61 +21,61 @@ default_config = {
     "elite_rate": 0.1,
     "mutation_rate": 0.1,
     "simulator": BaseSimulator,
+    "fitness_function": default_fitness,
     
     # Program options
-    "max_program_length": 50,
-    "min_program_length": 10,
+    "max_program_length": 20,
+    "min_program_length": 5,
     "num_registers": 4,
     "num_flags": 1,
-    "num_inputs": 5,
     "constant_input_ratio": 0.5,
 
     # Data options
     "terminals": [terminal.TRegister, terminal.TConstant],
     "functions": [function.FAdd, function.FSub, function.FDiv, function.FMul],
-    "constants": [1, 5, 10, 20, 50, 100],
-    "inputs": [range(i, i+5) for i in xrange(5)]
+    "constants": [1, 2, 5, 10, 20, 50, 100],
+    "constant_function": None,
+    "output": True,
+    "inputs": ["x", "y"]
 
 }
 
 
 def reduce_weights(inp):
     # TODO: This is bloated. Alternatives please...
-    
     values = inp[:]
+    
     # First, find the lowest weight (to optimize the output)
     lowest_weight = 1e1000
     for val in values:
-        if isinstance(val, tuple):
-            if val[1] < lowest_weight:
-                lowest_weight = values[1]
+        if isinstance(val, tuple) and val[1] < lowest_weight:
+            lowest_weight = val[1]
         else:
             lowest_weight = 1
             break
 
-    # divide out the weights so the smallest weight is 1.
-    if lowest_weight > 1:
-        values = map(lambda v: [v[0], v[1] / lowest_weight], values)
-
     ret = []
     
-    for val in values:
-        if isinstance(val, tuple):
-            ret += [val[0]] * val[1]
+    # divide out the weights so the smallest weight is 1.
+    for i in xrange(len(values)):
+        v = values[i]
+        if isinstance(v, tuple):
+            ret  += [v[0]] * (v[1] / lowest_weight)
         else:
-            ret.append(val)
+            ret.append(v)
 
     return ret
-
 
         
 
 class ProgramRunState(object):
     def __init__(self, program):
         self.program = program
-        self.registers = [0] * program.config["num_registers"]
+        self.registers = [1] * program.config["num_registers"]
         self.flags     = [0] * program.config["num_flags"]
         self.simulator = program.config["simulator"]()
+        self.inputs    = dict([(i, 0) for i in program.config["inputs"]])
+        
         
 
 class Program(object):
@@ -80,11 +83,13 @@ class Program(object):
         self.source = []
         self.world = world
         self.config = world.config
-        self.randomize()
         
-    def run(self):
+    def run(self, inputs = {}):
         state = ProgramRunState(self)
-
+        
+        if len(inputs) > 0:
+            state.inputs = inputs
+        
         # TODO: Better program flow control
         for func in self.source:
             func.execute(state)
@@ -94,7 +99,7 @@ class Program(object):
     def randomize(self):
         maxlen = self.config["max_program_length"]
         minlen = self.config["min_program_length"]
-        stop_chance = 1 / (maxlen - minlen)
+        stop_chance = 1.0 / float(maxlen - minlen)
 
         # make sure we're between the max and min lengths, stopping
         # somewhere randomly inbetween.
@@ -110,15 +115,14 @@ class Program(object):
     
 
 class World(object):
-    def __init__(self,  options = [], **kwargs):
-
+    def __init__(self,  options = {}, **kwargs):
         self.config = default_config
         self.config.update(options)
         self.config.update(kwargs)
 
         # TODO: Make sure terminals don't appear in config['terminals'] if their
         # num is less than one. (num_flags, num_registers, num_inputs, etc)
-        
+
         self.config["inputs"]    = reduce_weights(self.config["inputs"])
         self.config["constants"] = reduce_weights(self.config["constants"])
         
@@ -133,8 +137,9 @@ class World(object):
 
 
     def new_program(self):
-        return Program(self)
-
+        p = Program(self)
+        p.randomize()
+        return p
 
 
 

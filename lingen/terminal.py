@@ -3,6 +3,7 @@ from random import randint, choice
 
 class Terminal(object):
     readonly = True
+    
     def __init__(self, program):
         self.randomize(program)
 
@@ -13,11 +14,12 @@ class Terminal(object):
         raise Exception("evaluate not implemented!")
 
     def write(self, state, value):
-        raise Exception("write not implemented! (maybe set readonly to True?)")
+        raise Exception("write not implemented! (set terminal readonly False?)")
     
     def tostring(self):
         return "<" + self.__class__.__name+ ">"
 
+    
 class TRegister(Terminal):
     readonly = False
     
@@ -29,16 +31,21 @@ class TRegister(Terminal):
         return state.registers[self.register]
 
     def write(self, state, value):
-        state.registers[self.registers] = value
+        state.registers[self.register] = value
 
     def tostring(self):
-        return "register[" + str(self.register) + "]"
+        return "r[" + str(self.register) + "]"
 
+    
 class TConstant(Terminal):
     readonly = True
     value = 0
+    
     def randomize(self, program):
-        self.value = choice(program.config["constants"])
+        if program.config["constant_function"] is not None:
+            self.value = program.config["constant_function"]()
+        else:
+            self.value = choice(program.config["constants"])
 
     def evaluate(self, state):
         return self.value
@@ -46,3 +53,16 @@ class TConstant(Terminal):
     def tostring(self):
         return str(self.value)
 
+
+class TInput(Terminal):
+    readonly = True
+    key = None
+    
+    def randomize(self, program):
+        self.key = choice(program.config["inputs"])
+        
+    def evaluate(self, state):
+        return state.inputs[self.key]
+
+    def tostring(self):
+        return self.key

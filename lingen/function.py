@@ -34,7 +34,7 @@ class Function(object):
 
     def input(self,  t):
         """ shortcut to evalute an input terminal """
-        return self.inputs[t].evaluate(self.curstate)
+        return float(self.inputs[t].evaluate(self.curstate))
 
     def tostring(self):
         if self.function_str == None:
@@ -75,12 +75,15 @@ class FDiv(ArithmeticFunction):
     function_str = "/"
 
     def run(self, state):
-        return self.input(0) / self.input(1)
-
+        try:
+            return self.input(0) / self.input(1)
+        except ZeroDivisionError:
+            return 0
+            
 class FMul(ArithmeticFunction):
     function_str = "*"
 
     def run(self, state):
-        return self.ipnut(0) * self.input(1)
+        return self.input(0) * self.input(1)
 
 
