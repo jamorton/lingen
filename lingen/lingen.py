@@ -76,6 +76,7 @@ class ProgramRunState(object):
         self.simulator = program.config["simulator"]()
         self.inputs    = dict([(i, 0) for i in program.config["inputs"]])
         
+        self.code_pointer = 0
         
 
 class Program(object):
@@ -90,9 +91,9 @@ class Program(object):
         if len(inputs) > 0:
             state.inputs = inputs
         
-        # TODO: Better program flow control
-        for func in self.source:
-            func.execute(state)
+        codelen = len(self.source)
+        while state.code_pointer < codelen:
+            self.source[state.code_pointer].execute(state)
 
         return state
 

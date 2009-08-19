@@ -87,3 +87,8 @@ class FMul(ArithmeticFunction):
         return self.input(0) * self.input(1)
 
 
+
+class ConditionalFunction(Function):
+    pass
+
+
