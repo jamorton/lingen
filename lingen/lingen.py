@@ -23,9 +23,8 @@ default_config = {
     "simulator": BaseSimulator,
     "fitness_function": default_fitness,
     
-    # Program options
-    "max_program_length": 20,
-    "min_program_length": 5,
+    "max_program_length": 4,
+    "min_program_length": 6,
     "num_registers": 4,
     "num_flags": 1,
     "constant_input_ratio": 0.5,
@@ -92,8 +91,9 @@ class Program(object):
             state.inputs = inputs
         
         codelen = len(self.source)
-        while state.code_pointer < codelen:
+        while state.code_pointer < codelen and state.code_pointer >= 0:
             self.source[state.code_pointer].execute(state)
+            state.code_pointer += 1
 
         return state
 
@@ -127,8 +127,8 @@ class World(object):
         self.config["inputs"]    = reduce_weights(self.config["inputs"])
         self.config["constants"] = reduce_weights(self.config["constants"])
         
-        self.functions = self.config["functions"]
-        self.terminals = self.config["terminals"]
+        self.functions = reduce_weights(self.config["functions"])
+        self.terminals = reduce_weights(self.config["terminals"])
         
         # find out which terminals can be written to.
         self.terminals_writable = []

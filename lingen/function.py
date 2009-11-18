@@ -6,6 +6,7 @@ class Function(object):
     has_output = False
     num_args   = 0
     function_str  = None
+
     def __init__(self, program):
         self.program = program
 
@@ -30,7 +31,7 @@ class Function(object):
         self.curstate = None
 
     def run(self, state):
-        raise Exception("run not implemented!")
+        raise Exception("Function.run not implemented!")
 
     def input(self,  t):
         """ shortcut to evalute an input terminal """
