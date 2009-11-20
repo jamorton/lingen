@@ -1,5 +1,5 @@
 
-from random import  choice
+from random import choice, randint
     
 
 class Function(object):
@@ -42,9 +42,9 @@ class Function(object):
             self.function_str = self.__class__.__name__.lower()
         # Bleh...
         ostr = ", ".join([i.tostring() for i in self.inputs])
-        ostr = self.function_str + " (" + ostr + ")"
+        ostr = "%s(%s)" % (self.function_str, ostr)
         if self.has_output:
-            ostr = self.output.tostring() + " = " + ostr
+            ostr = "%s = %s" % (self.output.tostring(), ostr)
 
         return ostr
 
@@ -60,19 +60,19 @@ class ArithmeticFunction(Function):
 
 
     
-class FAdd(ArithmeticFunction):
+class Add(ArithmeticFunction):
     function_str = "+"
     
     def run(self, state):
         return self.input(0) + self.input(1)
 
-class FSub(ArithmeticFunction):
+class Sub(ArithmeticFunction):
     function_str = "-"
     
     def run(self, state):
         return self.input(0) - self.input(1)
 
-class FDiv(ArithmeticFunction):
+class Div(ArithmeticFunction):
     function_str = "/"
 
     def run(self, state):
@@ -81,7 +81,7 @@ class FDiv(ArithmeticFunction):
         except ZeroDivisionError:
             return 0
             
-class FMul(ArithmeticFunction):
+class Mul(ArithmeticFunction):
     function_str = "*"
 
     def run(self, state):
@@ -89,7 +89,48 @@ class FMul(ArithmeticFunction):
 
 
 
-class ConditionalFunction(Function):
-    pass
+class ComparisonFunction(Function):
+    num_args = 2
+    has_output = False
+    function_str = "<comparison>"
+    
+    def __init__(self, program):
+        Function.__init__(self, program)
+        
+        self.flag  = randint(0, program.config["num_flags"] - 1)
+
+    def run(self, state):
+        if self.compare():
+            state.flags[self.flag] = 1
+        else:
+            state.flags[self.flag] = 0
+            
+    def compare(self):
+        return False
+    
+    def tostring(self):
+        return "flag[%i] = (%s %s %s)" % (
+            self.flag,
+            self.inputs[0].tostring(),
+            self.function_str,
+            self.inputs[1].tostring()
+        )
 
 
+class CompareGreater(ComparisonFunction):
+    function_str = ">"
+    
+    def compare(self):
+        return self.input(0) > self.input(1)
+        
+class CompareLess(ComparisonFunction):
+    function_str = "<"
+    
+    def compare(self):
+        return self.input(0) < self.input(1)
+        
+class CompareEqual(ComparisonFunction):
+    function_str = "=="
+    
+    def compare(self):
+        return self.input(0) == self.input(1)

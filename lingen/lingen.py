@@ -31,7 +31,7 @@ default_config = {
 
     # Data options
     "terminals": [terminal.TRegister, terminal.TConstant],
-    "functions": [function.FAdd, function.FSub, function.FDiv, function.FMul],
+    "functions": [function.Add, function.Sub, function.Div, function.Mul, function.CompareGreater],
     "constants": [1, 2, 5, 10, 20, 50, 100],
     "constant_function": None,
     "output": True,
@@ -69,6 +69,7 @@ def reduce_weights(inp):
 
 class ProgramRunState(object):
     def __init__(self, program):
+        
         self.program = program
         self.registers = [1] * program.config["num_registers"]
         self.flags     = [0] * program.config["num_flags"]
@@ -100,7 +101,7 @@ class Program(object):
     def randomize(self):
         maxlen = self.config["max_program_length"]
         minlen = self.config["min_program_length"]
-        stop_chance = 1.0 / float(maxlen - minlen)
+        stop_chance = 1.0 / float(maxlen - minlen + 1.0)
 
         # make sure we're between the max and min lengths, stopping
         # somewhere randomly inbetween.
