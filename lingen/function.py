@@ -1,8 +1,19 @@
 
-from random import choice, randint
-    
 
-class Function(object):
+from random import choice, randint
+
+
+class IFunction(object):
+    def __init__(self, program):
+        pass
+    
+    def execute(self, state):
+        pass
+    
+    def tostring(self):
+        return "<function>"
+
+class Function(IFunction):
     has_output = False
     num_args   = 0
     function_str  = None
@@ -49,6 +60,9 @@ class Function(object):
         return ostr
 
 
+#=============================================================================#
+
+
 class ArithmeticFunction(Function):
     has_output = True
     num_args = 2
@@ -57,8 +71,6 @@ class ArithmeticFunction(Function):
     def tostring(self):
         return ' '.join((self.output.tostring(), "=", self.inputs[0].tostring(),
                          self.function_str, self.inputs[1].tostring()))
-
-
     
 class Add(ArithmeticFunction):
     function_str = "+"
@@ -88,6 +100,8 @@ class Mul(ArithmeticFunction):
         return self.input(0) * self.input(1)
 
 
+#=============================================================================#
+
 
 class ComparisonFunction(Function):
     num_args = 2
@@ -116,7 +130,6 @@ class ComparisonFunction(Function):
             self.inputs[1].tostring()
         )
 
-
 class CompareGreater(ComparisonFunction):
     function_str = ">"
     
@@ -134,3 +147,23 @@ class CompareEqual(ComparisonFunction):
     
     def compare(self):
         return self.input(0) == self.input(1)
+        
+
+#=============================================================================#
+
+
+class IfFlagSet(IFunction):
+    function_str = "<if_flag_set>"
+    has_output = False
+    num_args = 2
+    
+    def __init__(self, program):
+        pass
+    
+    
+
+
+
+
+
+

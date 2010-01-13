@@ -37,7 +37,7 @@ class TRegister(Terminal):
         return "r[" + str(self.register) + "]"
 
     
-class TConstant(Terminal):
+class Constant(Terminal):
     readonly = True
     value = 0
     
@@ -54,7 +54,7 @@ class TConstant(Terminal):
         return str(self.value)
 
 
-class TInput(Terminal):
+class Input(Terminal):
     readonly = True
     key = None
     

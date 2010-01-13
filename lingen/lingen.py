@@ -30,7 +30,7 @@ default_config = {
     "constant_input_ratio": 0.5,
 
     # Data options
-    "terminals": [terminal.TRegister, terminal.TConstant],
+    "terminals": [terminal.Register, terminal.Constant],
     "functions": [function.Add, function.Sub, function.Div, function.Mul, function.CompareGreater],
     "constants": [1, 2, 5, 10, 20, 50, 100],
     "constant_function": None,

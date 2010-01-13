@@ -1,3 +1,4 @@
+
 888 d8b                                     
 888 Y8P                                     
 888                                         
@@ -11,10 +12,8 @@
                   "Y88P"                    
 
 Lingen is a simple but flexible linear genetic
-programming library for python. 
+programming library written in python.
 
-
-
-copyright (c) 2009 Jon 'jonanin' Morton.
+Copyright (c) 2009 Jon 'jonanin' Morton.
 contact: jonanin at gmail
 

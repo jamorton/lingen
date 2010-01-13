@@ -7,7 +7,12 @@ import random
 def ran():
     return random.randint(0, 10)
 
-world = lingen.World(constant_function=ran, terminals=[terminal.TConstant, terminal.TRegister, terminal.TInput])
+
+settings = {
+     'terminals': [terminal.Constant, terminal.Register, terminal.Input]
+}
+
+world = lingen.World(settings, constant_function=ran)
 p = world.new_program()
 
 s = p.run({"x": 12, "y": 5})
