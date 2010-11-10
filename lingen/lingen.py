@@ -1,5 +1,4 @@
 
-
 import random
 import copy
 
@@ -7,27 +6,21 @@ import terminal
 import function
 
 class BaseSimulator(object):
-    pass
-
-def default_fitness(prog):
-    s = prog.run()
-    return s.registers[0]
+    def fitness(self):
+        pass
 
 default_config = {
-
     # Genetics/World options
     "population_size": 100,
     "max_generations": 200,
     "elite_rate": 0.1,
     "mutation_rate": 0.1,
     "simulator": BaseSimulator,
-    "fitness_function": default_fitness,
     
     "max_program_length": 4,
     "min_program_length": 6,
     "num_registers": 4,
     "num_flags": 1,
-    "constant_input_ratio": 0.5,
 
     # Data options
     "terminals": [terminal.Register, terminal.Constant],
@@ -36,9 +29,7 @@ default_config = {
     "constant_function": None,
     "output": True,
     "inputs": ["x", "y"]
-
 }
-
 
 def reduce_weights(inp):
     # TODO: This is bloated. Alternatives please...
@@ -64,27 +55,22 @@ def reduce_weights(inp):
             ret.append(v)
 
     return ret
-
         
 
 class ProgramRunState(object):
     def __init__(self, program):
-        
         self.program = program
         self.registers = [1] * program.config["num_registers"]
         self.flags     = [0] * program.config["num_flags"]
-        self.simulator = program.config["simulator"]()
         self.inputs    = dict([(i, 0) for i in program.config["inputs"]])
-        
         self.code_pointer = 0
-        
 
 class Program(object):
     def __init__(self, world):
         self.source = []
-        self.world = world
+        self.tworld = world
         self.config = world.config
-        
+		
     def run(self, inputs = {}):
         state = ProgramRunState(self)
         
@@ -102,7 +88,7 @@ class Program(object):
         maxlen = self.config["max_program_length"]
         minlen = self.config["min_program_length"]
         stop_chance = 1.0 / float(maxlen - minlen + 1.0)
-
+		
         # make sure we're between the max and min lengths, stopping
         # somewhere randomly inbetween.
         while len(self.source) < minlen or \
@@ -111,7 +97,6 @@ class Program(object):
             newfunc = random.choice(self.world.functions)(self)
             self.source.append(newfunc)
             
-
     def copy_source(self):
         return copy.deepcopy(self.source)
     
@@ -137,15 +122,7 @@ class World(object):
             if term.readonly == False:
                 self.terminals_writable.append(term)
 
-
     def new_program(self):
         p = Program(self)
         p.randomize()
         return p
-
-
-
-
-
-
-        

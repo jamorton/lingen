@@ -20,7 +20,7 @@ class Terminal(object):
         return "<" + self.__class__.__name+ ">"
 
     
-class TRegister(Terminal):
+class Register(Terminal):
     readonly = False
     
     def randomize(self, program):
@@ -55,7 +55,7 @@ class Constant(Terminal):
 
 
 class Input(Terminal):
-    readonly = True
+    readonly = True+
     key = None
     
     def randomize(self, program):

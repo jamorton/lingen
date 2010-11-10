@@ -1,7 +1,5 @@
 
-
 from random import choice, randint
-
 
 class IFunction(object):
     def __init__(self, program):
@@ -110,7 +108,6 @@ class ComparisonFunction(Function):
     
     def __init__(self, program):
         Function.__init__(self, program)
-        
         self.flag  = randint(0, program.config["num_flags"] - 1)
 
     def run(self, state):

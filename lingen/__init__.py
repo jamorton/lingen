@@ -21,7 +21,7 @@ see README ?
 [ ] Implement something much nicer, cleaner, and less silly than the
     reduce_weights() functionality
     
-[ ] Add a larger and more user-frienddly interface in World().
+[ ] Add a larger and more user-friendly interface in World().
 
 [ ] Implement more of the basic functions such as math stuff (trig, sqrt, etc),
     more conditionals, more operators, register ops (swap or someth?)
