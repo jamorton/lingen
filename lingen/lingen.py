@@ -5,9 +5,8 @@ import copy
 import terminal
 import function
 
-class BaseSimulator(object):
-    def fitness(self):
-        pass
+def default_fitness(program):
+	return id(program)
 
 default_config = {
     # Genetics/World options
@@ -15,10 +14,10 @@ default_config = {
     "max_generations": 200,
     "elite_rate": 0.1,
     "mutation_rate": 0.1,
-    "simulator": BaseSimulator,
-    
-    "max_program_length": 4,
-    "min_program_length": 6,
+    "fitness_function": default_fitness,
+	
+    "max_program_length": 6,
+    "min_program_length": 3,
     "num_registers": 4,
     "num_flags": 1,
 
@@ -68,8 +67,9 @@ class ProgramRunState(object):
 class Program(object):
     def __init__(self, world):
         self.source = []
-        self.tworld = world
+        self.world = world
         self.config = world.config
+		self.fitness = None
 		
     def run(self, inputs = {}):
         state = ProgramRunState(self)
@@ -79,8 +79,9 @@ class Program(object):
         
         codelen = len(self.source)
         while state.code_pointer < codelen and state.code_pointer >= 0:
-            self.source[state.code_pointer].execute(state)
+            fn = self.source[state.code_pointer]
             state.code_pointer += 1
+            fn.execute(state)
 
         return state
 
@@ -96,10 +97,21 @@ class Program(object):
 
             newfunc = random.choice(self.world.functions)(self)
             self.source.append(newfunc)
+	
+	def get_fitness(self):
+		if self.fitness is not None:
+			return self.fitness
+		self.fitness = self.config["fitness_function"](self)
+		return self.fitness
             
     def copy_source(self):
         return copy.deepcopy(self.source)
     
+class Population(object):
+	def __init__(self):
+		self.average_fitness = 0
+		self.median_fitness  = 0
+		self.programs = []
 
 class World(object):
     def __init__(self,  options = {}, **kwargs):
@@ -121,6 +133,11 @@ class World(object):
         for term in self.terminals:
             if term.readonly == False:
                 self.terminals_writable.append(term)
+		
+		self.generation = None
+				
+	def random_population(self):
+		
 
     def new_program(self):
         p = Program(self)

@@ -14,7 +14,7 @@ class Terminal(object):
         raise Exception("evaluate not implemented!")
 
     def write(self, state, value):
-        raise Exception("write not implemented! (set terminal readonly False?)")
+        raise Exception("write not implemented! (set terminal readonly to False?)")
     
     def tostring(self):
         return "<" + self.__class__.__name+ ">"
@@ -34,7 +34,7 @@ class Register(Terminal):
         state.registers[self.register] = value
 
     def tostring(self):
-        return "r[" + str(self.register) + "]"
+        return "r" + str(self.register)
 
     
 class Constant(Terminal):
@@ -55,7 +55,7 @@ class Constant(Terminal):
 
 
 class Input(Terminal):
-    readonly = True+
+    readonly = True
     key = None
     
     def randomize(self, program):
